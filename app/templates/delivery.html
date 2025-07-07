@@ -1,0 +1,56 @@
+{% extends 'base.html' %} {% block title %}Способы доставки{% endblock %} {%
+block extra_style %}
+<style>
+  .delivery-card {
+    transition: transform 0.2s ease;
+  }
+  .delivery-card:hover {
+    transform: scale(1.02);
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="container py-5">
+  <h2 class="text-center mb-5">📦 Способы доставки</h2>
+  <div class="row g-4">
+    <!-- Курьер -->
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm delivery-card">
+        <div class="card-body text-center">
+          <h5 class="card-title">🚚 Курьер</h5>
+          <p class="card-text">
+            Доставка по городу курьером до двери. Удобно, быстро и без лишних
+            хлопот!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Почта -->
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm delivery-card">
+        <div class="card-body text-center">
+          <h5 class="card-title">📮 Почта</h5>
+          <p class="card-text">
+            Отправляем заказы по всей России через Почту России и другие службы.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Самовывоз -->
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm delivery-card">
+        <div class="card-body text-center">
+          <h5 class="card-title">🏬 Самовывоз</h5>
+          <p class="card-text">
+            Вы можете самостоятельно забрать заказ из ближайшего пункта выдачи.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="{{ url_for('index.main') }}" class="btn btn-outline-secondary mt-4">
+    ← Назад на главную
+  </a>
+</div>
+{% endblock %}

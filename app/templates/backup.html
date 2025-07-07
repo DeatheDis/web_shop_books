@@ -1,0 +1,104 @@
+{% extends 'base.html' %} {% block title %}Книжный магазин - Регистрация{%
+endblock %} {% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-4">
+          <h3 class="card-title mb-4 text-center">Регистрация</h3>
+
+          <form method="POST" class="card-table" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="row mb-3">
+              <div class="col">
+                <label for="firstName" class="form-label">Имя</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="firstName"
+                  placeholder="Ваше имя"
+                  required
+                />
+              </div>
+              <div class="col">
+                <label for="lastName" class="form-label">Фамилия</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="lastName"
+                  placeholder="Ваша фамилия"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                placeholder="example@mail.ru"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="phone" class="form-label">Телефонный номер</label>
+              <input
+                type="tel"
+                class="form-control"
+                id="phone"
+                placeholder="+7 (999) 123-45-67"
+                pattern="^\+7\s?\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}$"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Пароль</label>
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                placeholder="Введите пароль"
+                required
+                minlength="6"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label for="confirmPassword" class="form-label"
+                >Повторить пароль</label
+              >
+              <input
+                type="password"
+                class="form-control"
+                id="confirmPassword"
+                placeholder="Повторите пароль"
+                required
+                minlength="6"
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mb-3">
+              Зарегистрироваться
+            </button>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <a
+                href="{{ url_for('index.main') }}"
+                class="btn btn-outline-secondary btn-sm"
+                >← Назад на главную</a
+              >
+              <small
+                >Уже есть аккаунт?
+                <a href="{{ url_for('index.login') }}">Войти</a></small
+              >
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
