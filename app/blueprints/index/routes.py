@@ -8,12 +8,6 @@ from db.models import User
 from . import main_blueprint
 
 
-@main_blueprint.route('/secret')
-@login_required
-def secret():
-    return render_template('secret.html', name=current_user.name)
-
-
 @main_blueprint.route('/')
 def main():
     return render_template('index.html')
@@ -52,7 +46,7 @@ def login():
             user = session.query(User).filter_by(email=form.email.data).first()
             if user and check_password_hash(user.password_hash, form.password.data):
                 login_user(user=user)
-                return redirect(url_for('index.secret'))
+                return redirect(url_for('index.main'))
         flash('Login failed.', 'danger')
     return render_template('login.html', form=form)
 
@@ -60,5 +54,5 @@ def login():
 @main_blueprint.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('index.login'))
+    return redirect(url_for('index.main'))
 

@@ -21,8 +21,9 @@ class User(Base, UserMixin):
 class Book(Base):
     __tablename__ = 'books'
     id: int = Column(Integer, primary_key=True)
-    name: str = Column(String(length=80))
+    title: str = Column(String(length=80))
     author: str = Column(String(length=80))
+    year: int = Column(Integer)
     price: float = Column(Float)
     genre: str = Column(String(length=80))
     cover: str = Column(String(length=80))
