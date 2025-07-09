@@ -1,12 +1,16 @@
 from flask import Flask
 from flask_login import LoginManager
 
-from config import settings
 from app.blueprints.index import main_blueprint
 from app.blueprints.public_info import public_info_blueprint
+from app.blueprints.books import book_blueprint
+
+from config import settings
 from db.database import init_db, session_scope
 from db.models import User
 from utils.book_loader import add_books_to_db
+
+
 
 
 login_manager = LoginManager()
@@ -30,4 +34,5 @@ def create_app():
     login_manager.login_view = 'login'
     app.register_blueprint(main_blueprint)
     app.register_blueprint(public_info_blueprint)
+    app.register_blueprint(book_blueprint)
     return app

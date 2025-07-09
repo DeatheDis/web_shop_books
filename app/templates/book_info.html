@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}{{book.title}} – Книжный магазин{% endblock %}
+
+{% block extra_style %}
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .book-image {
+      max-width: 100%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .sticky-buy-box {
+      position: sticky;
+      top: 100px;
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .rating-stars {
+      color: #f1c40f;
+    }
+
+    .section-divider {
+      border-top: 1px solid #dee2e6;
+      margin: 2rem 0;
+    }
+
+    .badge-age {
+      font-size: 0.9rem;
+    }
+
+    .book-image {
+      max-width: 300px;
+      max-height: 400px;
+      width: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row">
+    <!-- Левая часть -->
+    <div class="col-lg-8">
+      <!-- Название, Автор, Возраст -->
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h2 class="mb-1">{{book.title}}</h2>
+          <p class="text-muted mb-1">Автор: {{book.author}}</p>
+        </div>
+        <span class="badge bg-danger badge-age">{{book.age_limit}}+</span>
+      </div>
+
+      <!-- Рейтинг -->
+      <div class="mb-3">
+        <span class="rating-stars">★★★★★</span>
+        <span class="text-muted ms-2">({{book.rating}} из 5, {{book.reviews_count}} отзыва)</span>
+      </div>
+
+      <!-- Обложка -->
+      <div class="mb-3">
+        <img src="{{ url_for('static', filename=book.cover_image or 'covers/blue_book.png') }}" alt="{{ book.title }}" class="book-image">
+      </div>
+
+      <!-- Описание -->
+      <div class="mb-4">
+        <h5>О книге</h5>
+        <p>{{book.description}}</p>
+      </div>
+
+      <!-- Характеристики -->
+      <div class="section-divider"></div>
+      <h5>Характеристики</h5>
+      <ul class="list-unstyled">
+        <li><strong>Тип обложки:</strong> {{book.binding_type}}</li>
+        <li><strong>Формат:</strong> {{book.format}} мм</li>
+        <li><strong>Вес:</strong> {{book.weight}} г</li>
+        <li><strong>Издательство:</strong> {{book.publisher}}</li>
+        <li><strong>Год издания:</strong> {{book.year}}</li>
+        <li><strong>Возрастное ограничение:</strong> {{book.age_limit}}+</li>
+      </ul>
+
+      <!-- Отзывы -->
+      <div class="section-divider"></div>
+      <h5 class="mb-4">Отзывы</h5>
+
+      <!-- Один отзыв -->
+      <div class="mb-4">
+        <div class="d-flex align-items-center mb-2">
+          <strong class="me-2">Анна</strong>
+          <span class="text-warning">★★★★☆</span>
+        </div>
+        <p>Очень понравилась книга! Захватывающе и глубоко.</p>
+        <div class="ms-4">
+          <strong>Ответ:</strong>
+          <p class="small">Спасибо за отзыв!</p>
+        </div>
+      </div>
+
+      <!-- Форма отзыва -->
+      <div class="card shadow-sm mb-5">
+        <div class="card-body">
+          <h6 class="mb-3">Оставить отзыв</h6>
+          <form>
+            <div class="mb-3">
+              <label for="name" class="form-label">Имя</label>
+              <input type="text" class="form-control" id="name" required />
+            </div>
+            <div class="mb-3">
+              <label for="comment" class="form-label">Комментарий</label>
+              <textarea class="form-control" id="comment" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="rating" class="form-label">Оценка</label>
+              <select class="form-select" id="rating" required>
+                <option value="5">★★★★★</option>
+                <option value="4">★★★★☆</option>
+                <option value="3">★★★☆☆</option>
+                <option value="2">★★☆☆☆</option>
+                <option value="1">★☆☆☆☆</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-outline-primary">Отправить</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Правая часть: Блок покупки -->
+    <div class="col-lg-4">
+      <div class="card sticky-buy-box shadow-sm bg-white">
+        <div class="card-body">
+          <h4 class="mb-3">{{book.price}} ₽</h4>
+          <div class="mb-3">
+            <label for="quantity" class="form-label small">Количество</label>
+            <input type="number" class="form-control" id="quantity" value="1" min="1" />
+          </div>
+          <button class="btn btn-success w-100 mb-3">В корзину</button>
+          <p class="mb-1"><strong>Наличие:</strong> В 3 магазинах</p>
+          <p class="mb-0"><strong>Доставка:</strong> Курьер, Почта, Самовывоз</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

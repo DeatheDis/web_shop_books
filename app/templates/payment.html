@@ -1,5 +1,8 @@
-{% extends 'base.html' %} {% block title %}Способы оплаты{% endblock %} {% block
-extra_style %}
+{% extends 'base.html' %}
+
+{% block title %}Способы оплаты{% endblock %}
+
+{% block extra_style %}
 <style>
   .payment-card {
     transition: transform 0.2s ease;
@@ -8,8 +11,11 @@ extra_style %}
     transform: scale(1.02);
   }
 </style>
-{% endblock %} {% block content %}
+{% endblock %}
+
+{% block content %}
 <div class="container py-5">
+
   <h2 class="text-center mb-5">💰 Способы оплаты</h2>
   <div class="row g-4">
     <!-- Банковские карты -->
@@ -51,8 +57,5 @@ extra_style %}
       </div>
     </div>
   </div>
-    <a href="{{ url_for('index.main') }}" class="btn btn-outline-secondary mt-4">
-     ← Назад на главную
-    </a>
 </div>
 {% endblock %}
