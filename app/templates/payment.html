@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Способы оплаты{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+  <h2 class="text-center mb-5">💰 Способы оплаты</h2>
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <h5 class="card-title">💳 Банковские карты</h5>
+          <p class="card-text">
+            Мы принимаем Visa, MasterCard и Мир. Оплата происходит через
+            защищённый шлюз. Удобно и безопасно!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <h5 class="card-title">💻 Электронные деньги</h5>
+          <p class="card-text">
+            Вы можете оплатить заказ через ЮMoney, QIWI, WebMoney и другие
+            популярные сервисы.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <h5 class="card-title">💵 Наличные</h5>
+          <p class="card-text">
+            Оплата наличными возможна при получении заказа от курьера или в
+            пункте самовывоза.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

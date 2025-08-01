@@ -1,0 +1,74 @@
+{% extends 'base.html' %} {% block title %}Подтверждение заказа{% endblock %} {%
+block content %}
+<div class="container my-5">
+  <h1 class="mb-4 text-center">Подтверждение заказа</h1>
+
+  <div class="card shadow-sm mx-auto" style="max-width: 600px">
+    <div class="card-body">
+      <h5 class="card-title mb-4 text-primary">Спасибо за заказ!</h5>
+
+      <ul class="list-group list-group-flush mb-4">
+        <li class="list-group-item d-flex align-items-center">
+          <i class="bi bi-person-fill me-3 fs-4 text-secondary"></i>
+          <div>
+            <strong>ФИО:</strong><br />
+            {{ name }}
+          </div>
+        </li>
+        <li class="list-group-item d-flex align-items-center">
+          <i class="bi bi-telephone-fill me-3 fs-4 text-secondary"></i>
+          <div>
+            <strong>Телефон:</strong><br />
+            {{ phone }}
+          </div>
+        </li>
+
+        {% if delivery_method == 'courier' and address %}
+        <li class="list-group-item d-flex align-items-center">
+          <i class="bi bi-truck me-3 fs-4 text-secondary"></i>
+          <div>
+            <strong>Адрес доставки:</strong><br />
+            {{ address }}
+          </div>
+        </li>
+        {% elif delivery_method == 'pickup' and pickup_location %}
+        <li class="list-group-item d-flex align-items-center">
+          <i class="bi bi-shop me-3 fs-4 text-secondary"></i>
+          <div>
+            <strong>Пункт самовывоза:</strong><br />
+            {{ pickup_location }}
+          </div>
+        </li>
+        {% endif %}
+
+        <li class="list-group-item d-flex align-items-center">
+          <i class="bi bi-currency-ruble me-3 fs-4 text-secondary"></i>
+          <div>
+            <strong>Сумма заказа:</strong><br />
+            {{ "%.2f"|format(total) }} ₽
+          </div>
+        </li>
+        <li class="list-group-item d-flex align-items-center">
+          <i class="bi bi-calendar-event me-3 fs-4 text-secondary"></i>
+          <div>
+            <strong>Дата доставки:</strong><br />
+            {{ delivery_date }}
+          </div>
+        </li>
+        <li class="list-group-item d-flex align-items-center">
+          <i class="bi bi-wallet2 me-3 fs-4 text-secondary"></i>
+          <div>
+            <strong>Оплата:</strong><br />
+            при получении
+          </div>
+        </li>
+      </ul>
+      <form action="{{ url_for('order.orders') }}" method="get" class="text-center">
+        <button type="submit" class="btn btn-success btn-lg px-5">
+          Оформить
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

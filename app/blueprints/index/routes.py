@@ -1,58 +1,85 @@
-from flask import render_template, redirect, url_for, flash
-from app.forms import RegisterForm, LoginForm
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, login_required, current_user, logout_user
+from flask import render_template, redirect, url_for, flash, request
 from db.database import session_scope
-from db.models import User
+from db.models import Book
 
+from utils.category_utils import PREDEFINED_CATEGORIES
+from utils.category_utils import get_all_categories
 from . import main_blueprint
+
+
+@main_blueprint.app_context_processor
+def inject_categories():
+    with session_scope() as session:
+        all_categories = get_all_categories(session)
+
+    main_categories = list(all_categories.keys())
+    return dict(main_categories=main_categories, all_categories=all_categories)
 
 
 @main_blueprint.route('/')
 def main():
-    return render_template('index.html')
+    with session_scope() as session:
+        top_books = session.query(Book).order_by(Book.rating.desc()).limit(3).all()
+        categories = list(PREDEFINED_CATEGORIES.keys())
+        return render_template('index.html', top_books=top_books, categories=categories)
 
 
-@main_blueprint.route('register', methods=['GET', 'POST'])
-def register():
-    form = RegisterForm()
-    if form.validate_on_submit():
-        with session_scope() as session:
-            user = session.query(User).filter_by(email=form.email.data).first()
-            if user:
-                flash(message='User with this email already exists.', category='danger')
-                return redirect(url_for('index.register'))
-        user = User(name=form.name.data,
-                    surname=form.surname.data,
-                    email=form.email.data,
-                    phone=form.phone_number.data,
-                    password_hash=generate_password_hash(form.password.data))
-        with session_scope() as session:
-            session.add(user)
-        return redirect(url_for('index.login'))
-    elif form.errors:
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(f"{form[field].label.text}: {error}", "danger")
+@main_blueprint.route('/search', methods=['GET', 'POST'])
+def search():
+    user_search = request.args.get('q', '').strip()
+    if not user_search:
+        flash('Введите поисковый запрос', 'info')
+        return redirect(url_for('index.main'))
 
-    return render_template('register.html', form=form)
+    with session_scope() as session:
+        books = session.query(Book).filter(
+            Book.title.ilike(f'%{user_search}%') |
+            Book.author.ilike(f'%{user_search}%') |
+            Book.genre.ilike(f'%{user_search}%')).all()
+
+        return render_template('search.html', books=books, user_search=user_search)
 
 
-@main_blueprint.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        with session_scope() as session:
-            user = session.query(User).filter_by(email=form.email.data).first()
-            if user and check_password_hash(user.password_hash, form.password.data):
-                login_user(user=user)
-                return redirect(url_for('index.main'))
-        flash('Login failed.', 'danger')
-    return render_template('login.html', form=form)
+@main_blueprint.route('/category/<category_name>')
+@main_blueprint.route('/category/<category_name>/<genre>')
+def books_by_category(category_name, genre=None):
+    with session_scope() as session:
+        all_categories = get_all_categories(session)
 
+        all_known_genres = {g for genres in all_categories.values() for g in genres}
 
-@main_blueprint.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index.main'))
+        books = []
+        genres_in_category = []
 
+        if category_name in all_categories:
+            genres_in_category = all_categories[category_name]
+
+            if genre:
+                books = session.query(Book).filter(Book.genre == genre).all()
+                selected_genre = genre
+            else:
+                books = session.query(Book).filter(Book.genre.in_(genres_in_category)).all()
+                selected_genre = None
+
+        elif category_name.lower() == 'все книги':
+            books = session.query(Book).all()
+            selected_genre = None
+
+        elif category_name.lower() == 'другое':
+            books = session.query(Book).filter(
+                (Book.genre == None) | (~Book.genre.in_(all_known_genres))
+            ).all()
+            selected_genre = None
+
+        else:
+            selected_genre = None
+
+    return render_template(
+        'category.html',
+        books=books,
+        category=category_name,
+        genres_in_category=genres_in_category,
+        selected_genre=selected_genre,
+        main_categories=list(all_categories.keys()),
+        all_categories=all_categories
+    )

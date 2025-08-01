@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои заказы{% endblock %}
+
+{% block extra_style %}
+<style>
+  tr.animation {
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    position: relative;
+  }
+
+  tr.animation:hover {
+    background-color: #d0ebff;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+    transform: scale(1.02);
+    z-index: 1;
+  }
+
+  tr.animation td {
+    transition: color 0.3s ease;
+  }
+
+  tr.animation:hover td {
+    color: #0a58ca;
+  }
+
+  tr.animation:hover td:last-child::after {
+    opacity: 1;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <h1 class="mb-4 text-center">Мои заказы</h1>
+
+  {% if orders %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped text-center align-middle position-relative">
+      <thead class="table-light">
+        <tr>
+          <th>Номер заказа</th>
+          <th>Статус</th>
+          <th>Дата оформления</th>
+          <th>Сумма</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr class="animation" data-href="{{ url_for('order.order_info', order_id=order.id) }}">
+          <td>#{{ order.id }}</td>
+          <td>{{ order.status or 'Обрабатывается' }}</td>
+          <td>{{ order.date.strftime('%d.%m.%Y') }}</td>
+          <td>{{ order.total_price }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-center">У вас пока нет заказов.</p>
+  {% endif %}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('tr.animation').forEach(row => {
+      row.addEventListener('click', () => {
+        const href = row.getAttribute('data-href');
+        if (href) {
+          window.location.href = href;
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

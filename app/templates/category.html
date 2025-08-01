@@ -1,0 +1,107 @@
+{% extends 'base.html' %} {% block title %}Категория: {{ category }}{% endblock
+%} {% block extra_style %}
+<style>
+  .book-card {
+    max-width: 200px;
+  }
+
+  .book-img {
+    height: 150px;
+    object-fit: contain;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+  }
+
+  .nav-link {
+    cursor: pointer;
+  }
+
+  a.nav-link.active {
+    background-color: #0d6efd;
+    color: white !important;
+  }
+
+  .nav-link {
+    text-decoration: none;
+  }
+
+  .nav-tabs .nav-link.active {
+    background-color: white;
+    color: #212529 !important;
+    /* стандартный темный цвет Bootstrap */
+    border-color: #dee2e6 #dee2e6 #fff;
+  }
+
+  .price {
+    font-weight: bold;
+    color: #198754;
+  }
+
+  .rating {
+    color: #ffc107;
+  }
+
+  .card-footer {
+    padding: 0.5rem;
+    background-color: transparent;
+    border-top: none;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+  <h2>Категория: <strong>{{ category }}</strong></h2>
+
+  <ul class="nav nav-tabs mb-4" id="genreTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a class="nav-link {% if not selected_genre %}active{% endif %}"
+        href="{{ url_for('index.books_by_category', category_name=category) }}" role="tab">
+        Все
+      </a>
+    </li>
+    {% for genre in genres_in_category %}
+    <li class="nav-item" role="presentation">
+      <a class="nav-link {% if selected_genre == genre %}active{% endif %}"
+        href="{{ url_for('index.books_by_category', category_name=category, genre=genre) }}" role="tab">
+        {{ genre }}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <div class="row g-3">
+    {% if books %}
+    {% for book in books %}
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+      <a href="{{ url_for('book.book', book_id=book.id) }}" class="text-decoration-none text-dark d-block h-100">
+        <div class="card book-card h-100 d-flex flex-column animation">
+          <img src="{{ url_for('static', filename='covers/blue_book.png') }}" alt="{{ book.title }}"
+            class="card-img-top book-img" />
+          <div class="card-body p-2 flex-grow-1 d-flex flex-column">
+            <h6 class="card-title mb-1">{{ book.title }}</h6>
+            <p class="card-text small mb-1 text-muted">{{ book.author }}</p>
+            <p class="card-text small mb-1">Год: {{ book.year }}</p>
+            <p class="card-text price mb-1">{{ book.price }} ₽</p>
+            <p class="card-text rating mb-2">
+              ★ {{book.rating}} ({{ book.reviews_count }})
+            </p>
+            <div class="mt-auto">
+              <form method="POST" action="{{ url_for('cart.add_to_cart', book_id=book.id) }}">
+                <button type="submit" class="btn btn-primary btn-add-cart">
+                  <i class="bi bi-cart-plus"></i> В корзину
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>Книги не найдены в этой категории.</p>
+    {% endif %}
+  </div>
+
+  {% endblock %}

@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% block title %}Корзина{% endblock %}
+
+{% block extra_style %}
+<style>
+  .book-image {
+    width: 80px;
+    height: auto;
+  }
+
+  .cart-item {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 15px;
+    margin-bottom: 1rem;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .qty-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn-qty {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    font-size: 18px;
+  }
+
+  .checkout-box {
+    border: 1px solid #dee2e6;
+    padding: 20px;
+    border-radius: 8px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-8">
+      <h2 class="mb-4">Корзина</h2>
+
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="selectAll">
+        <label class="form-check-label" for="selectAll">Выбрать все товары</label>
+      </div>
+      <form id="cartForm" method="POST" action="{{ url_for('cart.delete_selected') }}">
+        <div id="cartItems">
+          {% for item in cart_items %}
+          <div class="cart-item d-flex align-items-start" data-item-id="{{ item.id }}"
+            data-price="{{ item.book.price }}" data-qty="{{ item.count }}">
+            <div class="form-check me-3">
+              <input class="form-check-input item-checkbox" type="checkbox" name="selected_items" value="{{ item.id }}">
+            </div>
+            <img src="{{ url_for('static', filename=item.book.cover_image or 'covers/blue_book.png') }}"
+              class="book-image me-3" alt="{{ item.book.title }}">
+            <div class="flex-grow-1">
+              <h5 class="mb-1">{{ item.book.title }}</h5>
+              <p class="mb-0 text-muted">Автор: {{ item.book.author }}</p>
+              <p class="mb-2 text-muted">Год: {{ item.book.year }}</p>
+            </div>
+            <div class="text-end" style="min-width: 200px;">
+              <div class="qty-wrapper mb-2">
+                <button type="button" class="btn btn-outline-secondary btn-qty minus" {% if item.count <=1 %}disabled{%
+                  endif %}>-</button>
+                <span class="quantity">{{ item.count }}</span>
+                <button type="button" class="btn btn-outline-secondary btn-qty plus">+</button>
+              </div>
+              <p class="mb-1 text-muted">Цена за штуку: ₽<span class="price">{{ '%.2f' % item.book.price }}</span></p>
+              <p class="mb-1 fw-bold">Общая сумма: ₽<span class="total-item-price">{{ '%.2f' % (item.book.price *
+                  item.count) }}</span></p>
+            </div>
+          </div>
+          {% else %}
+          <p>Корзина пуста.</p>
+          {% endfor %}
+        </div>
+        {% if cart_items %}
+        <button type="button" class="btn btn-danger mb-4" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+          Удалить выбранные
+        </button>
+        {% endif %}
+      </form>
+    </div>
+
+    <div class="col-md-4">
+      <div class="checkout-box mt-4 mt-md-0">
+        <h5>Оформление заказа</h5>
+        <p class="mb-1">Товаров: <span id="totalCount">0</span></p>
+        <p class="mb-3">Общая сумма: ₽<span id="totalPrice">0.00</span></p>
+        <form id="checkoutForm" action="{{ url_for('order.checkout') }}" method="post">
+          <input type="hidden" name="selected_items" id="selected_items" value="">
+          <button type="submit" class="btn btn-primary w-100">Перейти к оформлению</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteLabel">Подтверждение удаления</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        Вы уверены, что хотите удалить выбранные товары из корзины?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Да, удалить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const cartItems = document.getElementById('cartItems');
+    const totalCount = document.getElementById('totalCount');
+    const totalPrice = document.getElementById('totalPrice');
+    const selectAll = document.getElementById('selectAll');
+    const cartForm = document.getElementById('cartForm');
+    const checkoutForm = document.getElementById('checkoutForm');
+    const selectedItemsInput = document.getElementById('selected_items');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+    function updateTotals() {
+      let totalQty = 0, totalSum = 0;
+      document.querySelectorAll('.item-checkbox:checked').forEach(cb => {
+        const item = cb.closest('.cart-item');
+        const qty = parseInt(item.querySelector('.quantity').textContent);
+        const price = parseFloat(item.querySelector('.price').textContent);
+        totalQty += qty;
+        totalSum += qty * price;
+      });
+      totalCount.textContent = totalQty;
+      totalPrice.textContent = totalSum.toFixed(2);
+    }
+
+    function updateItemUI(item) {
+      const qty = parseInt(item.querySelector('.quantity').textContent);
+      const price = parseFloat(item.querySelector('.price').textContent);
+      const total = qty * price;
+      item.querySelector('.total-item-price').textContent = total.toFixed(2);
+      item.querySelector('.minus').disabled = qty <= 1;
+    }
+
+    cartItems.addEventListener('click', e => {
+      const btn = e.target;
+      const item = btn.closest('.cart-item');
+      if (!item) return;
+
+      const qtyEl = item.querySelector('.quantity');
+      let qty = parseInt(qtyEl.textContent);
+
+      if (btn.classList.contains('plus')) qty++;
+      if (btn.classList.contains('minus') && qty > 1) qty--;
+
+      qtyEl.textContent = qty;
+      updateItemUI(item);
+      updateTotals();
+    });
+
+    selectAll.addEventListener('change', () => {
+      document.querySelectorAll('.item-checkbox').forEach(cb => {
+        cb.checked = selectAll.checked;
+      });
+      updateTotals();
+    });
+
+    document.querySelectorAll('.item-checkbox').forEach(cb => {
+      cb.checked = false;
+      cb.addEventListener('change', updateTotals);
+    });
+
+    checkoutForm.addEventListener('submit', e => {
+      const ids = Array.from(document.querySelectorAll('.item-checkbox:checked'))
+        .map(cb => cb.value);
+      selectedItemsInput.value = ids.join(',');
+    });
+
+    confirmDeleteBtn.addEventListener('click', () => {
+      cartForm.submit();
+    });
+
+    selectAll.checked = false;
+    updateTotals();
+  });
+</script>
+
+{% endblock %}

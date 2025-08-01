@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Детали заказа{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <a href="{{ url_for('order.orders') }}" class="btn btn-outline-secondary mb-4">
+    ← Назад к моим заказам
+  </a>
+
+  <h1 class="mb-4 text-center">Детали заказа №{{ order.id }}</h1>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <ul class="list-group list-group-flush mb-4">
+        <li class="list-group-item"><strong>Статус:</strong> {{ order.status }}</li>
+        <li class="list-group-item"><strong>Дата оформления:</strong> {{ order.date.strftime("%d.%m.%Y") }}</li>
+
+        {% if order.delivery_date %}
+        <li class="list-group-item"><strong>Дата доставки:</strong> {{ order.delivery_date.strftime("%d.%m.%Y") }}</li>
+        {% endif %}
+
+        <li class="list-group-item"><strong>ФИО заказчика:</strong> {{ order.user.name }} {{ order.user.surname }}</li>
+        <li class="list-group-item"><strong>Телефон:</strong> {{ order.user.phone }}</li>
+        <li class="list-group-item"><strong>Адрес доставки:</strong> {{ order.address or 'Самовывоз' }}</li>
+        <li class="list-group-item"><strong>Оплата:</strong> при получении</li>
+        <li class="list-group-item">
+          <strong>Товары:</strong>
+          <ul class="mt-2">
+            {% for item in order.items %}
+            <li>{{ item.book.title }} — {{ item.count }} шт. — {{ "%.2f"|format(item.price * item.count) }} ₽</li>
+            {% else %}
+            <li class="text-muted">Нет товаров в заказе</li>
+            {% endfor %}
+          </ul>
+        </li>
+        <li class="list-group-item">
+          <strong>Итого к оплате:</strong>
+          {{ "%.2f"|format(order.total_price if order.total_price is defined else order.items | map(attribute='price') |
+          sum) }} ₽
+        </li>
+      </ul>
+
+      {% if order.status.strip()|lower == 'отменен' %}
+      <button type="button" class="btn btn-secondary" disabled>Заказ отменён</button>
+      {% else %}
+      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
+        Отменить заказ
+      </button>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cancelModalLabel">Отменить заказ</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+        </div>
+        <div class="modal-body">Вы уверены, что хотите отменить заказ?</div>
+        <div class="modal-footer">
+          <form method="post" action="{{ url_for('order.cancel_order', order_id=order.id) }}">
+            <button type="submit" class="btn btn-danger">Да</button>
+          </form>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

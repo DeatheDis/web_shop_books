@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Связь с нами{% endblock %}
+
+{% block extra_style %}
+<style>
+  .contact-icon {
+    font-size: 1.8rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h2 class="text-center mb-5">📞 Связь с нами</h2>
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title text-center mb-4">📬 Контактная информация</h5>
+          <ul class="list-unstyled fs-5">
+            <li>
+              <span class="contact-icon">📍</span> Адрес: г. Москва, ул.
+              Пушкина, дом Колотушкина
+            </li>
+            <li>
+              <span class="contact-icon">📧</span> Email: info@bookstore.ru
+            </li>
+            <li>
+              <span class="contact-icon">📞</span> Телефон: +7 123 456-78-90
+            </li>
+            <li>
+              <span class="contact-icon">🕑</span> Часы работы: Пн–Пт,
+              9:00–18:00
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title text-center mb-4">✉️ Напишите нам</h5>
+          <form method="post" action="{{ url_for('public_info.contacts') }}">
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+              {{ form.name.label(class="form-label") }}
+              {{ form.name(class="form-control", placeholder="Ваше имя") }}
+              {% for error in form.name.errors %}
+              <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="mb-3">
+              {{ form.email.label(class="form-label") }}
+              {{ form.email(class="form-control", placeholder="example@mail.ru") }}
+              {% for error in form.email.errors %}
+              <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="mb-3">
+              {{ form.message.label(class="form-label") }}
+              {{ form.message(class="form-control", rows="4", placeholder="Ваше сообщение") }}
+              {% for error in form.message.errors %}
+              <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="d-grid">
+              {{ form.submit(class="btn btn-primary") }}
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

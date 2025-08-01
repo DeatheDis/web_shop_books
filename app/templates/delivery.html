@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Способы доставки{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h2 class="text-center mb-5">📦 Способы доставки</h2>
+  <div class="row g-4">
+
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <h5 class="card-title">🚚 Курьер</h5>
+          <p class="card-text">
+            Доставка по городу курьером до двери. Удобно, быстро и без лишних
+            хлопот!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <h5 class="card-title">📮 Почта</h5>
+          <p class="card-text">
+            Отправляем заказы по всей России через Почту России и другие службы.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <h5 class="card-title">🏬 Самовывоз</h5>
+          <p class="card-text">
+            Вы можете самостоятельно забрать заказ из ближайшего пункта выдачи.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

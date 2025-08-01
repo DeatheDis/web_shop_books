@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}{{book.title}} – Книжный магазин{% endblock %}
+
+{% block extra_style %}
+<style>
+  body {
+    background-color: #f8f9fa;
+  }
+
+  .book-image {
+    max-width: 300px;
+    max-height: 400px;
+    width: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+
+  .sticky-buy-box {
+    position: sticky;
+    top: 100px;
+    border-radius: 8px;
+    padding: 1rem;
+  }
+
+  .rating-stars {
+    color: #f1c40f;
+  }
+
+  .section-divider {
+    border-top: 1px solid #dee2e6;
+    margin: 2rem 0;
+  }
+
+  .badge-age {
+    font-size: 0.9rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="d-flex justify-content-between align-items-start">
+      <div>
+        <h2 class="mb-1">{{book.title}}</h2>
+        <p class="text-muted mb-1">{{book.author}}</p>
+
+        <div class="mb-2">
+          <span class="badge bg-secondary me-1">{{book.category}}</span>
+          <span class="badge bg-info">{{book.genre}}</span>
+        </div>
+      </div>
+      <span class="badge bg-danger badge-age">{{book.age_limit}}+</span>
+    </div>
+
+    <div class="mb-3">
+      <span class="rating-stars">★★★★★</span>
+      <span class="text-muted ms-2">({{book.rating}} из 5, {{book.reviews_count}} отзыва)</span>
+    </div>
+
+    <div class="mb-3">
+      <img src="{{ url_for('static', filename=book.cover_image or 'covers/blue_book.png') }}" alt="{{ book.title }}"
+        class="book-image">
+    </div>
+
+    <div class="mb-4">
+      <h5>О книге</h5>
+      <p>{{book.description}}</p>
+    </div>
+
+    <div class="section-divider"></div>
+    <h5>Характеристики</h5>
+    <ul class="list-unstyled">
+      <li><strong>Тип обложки:</strong> {{book.binding_type}}</li>
+      <li><strong>Формат:</strong> {{book.format}} мм</li>
+      <li><strong>Вес:</strong> {{book.weight}} г</li>
+      <li><strong>Издательство:</strong> {{book.publisher}}</li>
+      <li><strong>Год издания:</strong> {{book.year}}</li>
+      <li><strong>Возрастное ограничение:</strong> {{book.age_limit}}+</li>
+    </ul>
+
+    <div class="section-divider"></div>
+    <h5 class="mb-4">Отзывы</h5>
+
+    {% for review in book.reviews if not review.parent_id %}
+    <div class="mb-4">
+      <div class="d-flex align-items-center mb-2">
+        <strong class="me-2">{{ review.user.name }}</strong>
+        <span class="text-warning">{{ '★' * review.grade }}{{ '☆' * (5 - review.grade) }}</span>
+      </div>
+      <p>{{ review.review }}</p>
+
+      {% for reply in review.replies %}
+      <div class="ms-4">
+        <strong>Ответ:</strong>
+        <p class="small">{{ reply.review }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">Пока нет отзывов.</p>
+    {% endfor %}
+
+    {% if current_user.is_authenticated %}
+    <div class="card shadow-sm mb-5">
+      <div class="card-body">
+        <h6 class="mb-3">Оставить отзыв</h6>
+        <form method="post" action="{{ url_for('book.add_review', book_id=book.id) }}">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.review.label(class="form-label") }}
+            {{ form.review(class="form-control", rows=3) }}
+          </div>
+          <div class="mb-3">
+            {{ form.grade.label(class="form-label") }}
+            {{ form.grade(class="form-select") }}
+          </div>
+          <button type="submit" class="btn btn-outline-primary">{{ form.submit.label.text }}</button>
+        </form>
+      </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+      <a href="{{ url_for('auth.login') }}">Войдите</a>, чтобы оставить отзыв.
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card sticky-buy-box shadow-sm bg-white">
+      <div class="card-body">
+        <h4 class="mb-3">{{book.price}} ₽</h4>
+        <form method="POST" action="{{ url_for('cart.add_to_cart', book_id=book.id) }}">
+          <div class="mb-3">
+            <label for="quantity" class="form-label small">Количество</label>
+            <input type="number" class="form-control" id="quantity" name="count" value="1" min="1" />
+          </div>
+          <button type="submit" class="btn btn-outline-primary">В корзину</button>
+        </form>
+        <p class="mb-1"><strong>Наличие:</strong> В 3 магазинах</p>
+        <p class="mb-0"><strong>Доставка:</strong> Курьер, Почта, Самовывоз</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

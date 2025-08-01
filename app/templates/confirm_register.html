@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Подтверждение - Книжный магазин{% endblock %}
+
+{% block extra_style %}
+<style>
+  body {
+    background: #f2f4f7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .sms-box {
+    max-width: 400px;
+    width: 100%;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .sms-box h4 {
+    margin-bottom: 1rem;
+  }
+
+  .sms-box .form-control {
+    text-align: center;
+    font-size: 1.25rem;
+    letter-spacing: 0.3em;
+  }
+
+  .resend-link {
+    font-size: 0.9rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="sms-box text-center">
+      <h4>Подтверждение номера</h4>
+      <p class="text-muted">Мы отправили SMS с кодом на ваш номер телефона</p>
+      <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          {{ form.code.label }}
+          {{ form.code(class="form-control", placeholder="____") }}
+        </div>
+
+        <div class="d-grid gap-2">
+          {{ form.submit(class="btn btn-primary") }}
+        </div>
+
+        <div class="text-center mt-3">
+          <a href="{{ url_for('auth.confirm', resend='resend') }}" class="text-decoration-none small">
+            Отправить код повторно
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

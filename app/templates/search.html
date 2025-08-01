@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block back_button %}{% endblock %}
+
+{% block title %}Результаты поиска{% endblock %}
+
+{% block extra_style %}
+<style>
+  .book-card {
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .book-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.02);
+  }
+
+  .book-img {
+    max-height: 120px;
+    width: 100%;
+    object-fit: contain;
+    background-color: #f8f9fa;
+  }
+
+  .btn-add-cart {
+    width: 100%;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <h3 class="mb-4">Результаты поиска по запросу "<span id="search-query">{{ user_search }}</span>"</h3>
+
+  {% if books %}
+  <div id="books-container" class="row g-4">
+    {% for book in books %}
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      <div class="card book-card h-100 d-flex flex-column">
+        <a href="{{ url_for('book.book', book_id=book.id) }}"
+          class="text-decoration-none text-dark flex-grow-1 d-block">
+          <img src="{{ url_for('static', filename='covers/blue_book.png') }}" alt="{{ book.title }}"
+            class="card-img-top book-img" />
+          <div class="card-body">
+            <h5 class="card-title">{{ book.title }}</h5>
+            <p class="card-text mb-1"><strong>Автор:</strong> {{ book.author }}</p>
+            <p class="card-text mb-1"><strong>Категория:</strong> {{ book.category }}</p>
+            <p class="card-text mb-1"><strong>Жанр:</strong> {{ book.genre }}</p>
+            <p class="card-text mb-1"><strong>Год издания:</strong> {{ book.year }}</p>
+            <p class="card-text mb-1"><strong>Цена:</strong> {{book.price}} ₽</p>
+            <p class="card-text mb-3"><strong>Оценка:</strong> {{book.rating}}</p>
+          </div>
+        </a>
+        <form method="POST" action="{{ url_for('cart.add_to_cart', book_id=book.id) }}" class="m-3">
+          <button type="submit" class="btn btn-primary btn-add-cart">
+            <i class="bi bi-cart-plus"></i> В корзину
+          </button>
+        </form>
+
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-muted">Ничего не найдено по вашему запросу.</p>
+  {% endif %}
+
+</div>
+{% endblock %}

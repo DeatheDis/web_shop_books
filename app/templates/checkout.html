@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block title %}Оформление заказа{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <h2 class="mb-4">Оформление заказа</h2>
+
+  {% if cart_items %}
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">Ваш заказ</h5>
+    </div>
+    <ul class="list-group list-group-flush">
+      {% for item in cart_items %}
+      <li class="list-group-item d-flex justify-content-between">
+        {{ item.book.title }} – {{ item.count }} × {{ item.book.price }} ₽
+        <strong>{{ (item.count * item.book.price)|round(2) }} ₽</strong>
+      </li>
+      {% endfor %}
+      <li class="list-group-item d-flex justify-content-between fw-bold">
+        <span>Итого:</span>
+        <span id="total_top">{{ total|round(2) }} ₽</span>
+      </li>
+    </ul>
+  </div>
+
+  <form method="post" action="{{ url_for('order.confirm_order') }}" class="card p-4">
+    <h5 class="mb-3">Контактные данные</h5>
+
+    <div class="mb-3">
+      <label for="fullname" class="form-label">Фамилия Имя</label>
+      <input type="text" name="fullname" class="form-control" required
+        value="{{ current_user.name }} {{ current_user.surname }}">
+    </div>
+
+    <div class="mb-3">
+      <label for="phone" class="form-label">Телефон</label>
+      <input type="tel" name="phone" class="form-control" required value="{{ current_user.phone or '' }}">
+    </div>
+
+    <div class="mb-3">
+      <label for="delivery_method" class="form-label">Способ доставки</label>
+      <select name="delivery_method" id="delivery_method" class="form-select" required>
+        <option value="">-- Выберите --</option>
+        <option value="courier">Курьер</option>
+        <option value="pickup">Самовывоз</option>
+        <option value="mail">Почта</option>
+      </select>
+    </div>
+
+    <div class="mb-3" id="address_field" style="display:none;">
+      <label for="address" class="form-label">Адрес:</label>
+      <input type="text" name="address" id="address" class="form-control">
+    </div>
+
+    <div class="mb-3" id="mail_address_field" style="display:none;">
+      <label for="mail_address" class="form-label">Почтовый адрес</label>
+      <input type="text" name="mail_address" id="mail_address" class="form-control">
+    </div>
+
+    <div id="pickup-block" class="mb-3" style="display: none;">
+      <label for="pickup_location" class="form-label">Пункт самовывоза</label>
+      <select name="pickup_location" id="pickup_location" class="form-select">
+        <option value="">-- Выберите пункт --</option>
+        {% for key, address in pickup_locations.items() %}
+        <option value="{{ key }}">{{ address }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Сумма заказа</label>
+      <div class="form-control-plaintext fw-bold"
+        style="background:#e9ecef; padding: .375rem .75rem; border: 1px solid #ced4da; border-radius: .25rem;">
+        {{ total|round(2) }} ₽
+      </div>
+    </div>
+
+    <div class="alert alert-info">Оплата производится при получении</div>
+
+    <input type="hidden" name="total" value="{{ total }}">
+
+    <button type="submit" class="btn btn-primary">Подтвердить заказ</button>
+  </form>
+
+  {% else %}
+  <p>Нет товаров для оформления заказа.</p>
+  {% endif %}
+
+  <a href="{{ url_for('cart.cart') }}" class="btn btn-link mt-4">← Назад в корзину</a>
+</div>
+
+<script>
+  const deliverySelect = document.getElementById('delivery_method');
+  const addressField = document.getElementById('address_field');
+  const mailAddressField = document.getElementById('mail_address_field');
+  const pickupBlock = document.getElementById('pickup-block');
+
+  function toggleFields() {
+    const val = deliverySelect.value;
+
+    document.getElementById('address').value = '';
+    document.getElementById('mail_address').value = '';
+    document.getElementById('pickup_location').value = '';
+
+    addressField.style.display = 'none';
+    mailAddressField.style.display = 'none';
+    pickupBlock.style.display = 'none';
+
+    if (val === 'courier') {
+      addressField.style.display = 'block';
+    } else if (val === 'pickup') {
+      pickupBlock.style.display = 'block';
+    } else if (val === 'mail') {
+      mailAddressField.style.display = 'block';
+    }
+  }
+
+  deliverySelect.addEventListener('change', toggleFields);
+
+  window.addEventListener('DOMContentLoaded', toggleFields);
+</script>
+
+{% endblock %}

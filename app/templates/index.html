@@ -1,136 +1,62 @@
 {% extends 'base.html' %}
 
+{% block back_button %}{% endblock %}
+
 {% block title %}Книжный магазин - Главная{% endblock %}
 
 {% block extra_style %}
-  <style>
-    html, body {
-
-      height: 100%;
-      margin: 0;
-    }
-  </style>
+<style>
+  .card-img-top {
+    max-height: 150px;
+    width: 100%;
+    object-fit: contain;
+    background-color: #f8f9fa;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid vh-100 d-flex flex-column">
-
-    <div class="row flex-grow-1">
-      <!-- Левая рамка -->
-      <aside class="col-md-2 d-flex flex-column gap-3 p-3 border-end">
-
-        <!-- Отдельная рамка для заголовка -->
-        <div class="border rounded p-2 text-center bg-light">
-          <h2 class="fs-5 mb-0">Книжный магазин</h2>
-        </div>
-
-        <!-- Отдельная рамка для каталога -->
-        <div class="border rounded p-2 flex-grow-1 overflow-auto">
-          <h5 class="fs-6 mb-3">Каталог</h5>
-          <ul class="list-group list-group-flush small">
-            <li class="list-group-item">Фантастика</li>
-            <li class="list-group-item">Детектив</li>
-            <li class="list-group-item">Роман</li>
-            <li class="list-group-item">Исторические</li>
-            <li class="list-group-item">Научные</li>
-          </ul>
-        </div>
-      </aside>
-
-<!-- Правая большая рамка -->
-<main class="col-md-10 d-flex flex-column flex-grow-1 p-3">
-
-  <!-- Поисковая полоска с кнопками -->
-  <div class="d-flex mb-4 flex-shrink-0">
-    <input type="text" class="form-control me-2" placeholder="Поиск по каталогу..." />
-    <button class="btn btn-primary me-2">Поиск</button>
-    {% if current_user.is_authenticated %}
-      <a href="" class="btn btn-outline-info me-2">Заказы</a>
-      <a href="" class="btn btn-outline-secondary me-2">Корзина</a>
-      <a href="{{ url_for('index.logout') }}" class="btn btn-outline-danger me-2">Выход</a>
-    {% else %}
-      <a href="{{ url_for('index.login') }}" class="btn btn-outline-secondary me-2">Вход</a>
-      <a href="{{ url_for('index.register') }}" class="btn btn-outline-secondary">Регистрация</a>
-    {% endif %}
-  </div>
-
-  <!-- Внешняя большая рамка -->
-  <div class="border rounded flex-grow-1 p-3 overflow-auto d-flex flex-column gap-4">
-
-    <!-- Топ 3 продаж недели в своей рамке -->
-    <section class="border rounded p-3">
-      <h4>Топ 3 продаж недели</h4>
-      <div class="row g-3">
-        <!-- карточки книг -->
-        <div class="col-md-4">
-          <div class="card h-100">
-            <img src="https://via.placeholder.com/150x200?text=Книга+1" class="card-img-top" alt="Книга 1" />
+<div class="border rounded flex-grow-1 p-3 overflow-auto d-flex flex-column gap-4">
+  <section class="border rounded p-3">
+    <h4>Топ 3 продаж недели</h4>
+    <div class="row g-3">
+      {% for book in top_books %}
+      <div class="col-md-4">
+        <a href="{{ url_for('book.book', book_id=book.id) }}" class="text-decoration-none text-dark">
+          <div class="card h-100 animation">
+            <img src="{{ url_for('static', filename='covers/blue_book.png') }}" class="card-img-top"
+              alt="{{ book.title }}">
             <div class="card-body">
-              <h5 class="card-title">Название книги 1</h5>
-              <p class="card-text">Автор 1</p>
+              <h5 class="card-title">{{ book.author }}</h5>
+              <em>
+                <p class="card-text">{{ book.title }}</p>
+              </em>
+              <p class="card-rating mb-1">
+                <strong>Рейтинг:</strong> {{ book.rating }}
+              </p>
             </div>
           </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card h-100">
-            <img src="https://via.placeholder.com/150x200?text=Книга+2" class="card-img-top" alt="Книга 2" />
-            <div class="card-body">
-              <h5 class="card-title">Название книги 2</h5>
-              <p class="card-text">Автор 2</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card h-100">
-            <img src="https://via.placeholder.com/150x200?text=Книга+3" class="card-img-top" alt="Книга 3" />
-            <div class="card-body">
-              <h5 class="card-title">Название книги 3</h5>
-              <p class="card-text">Автор 3</p>
-            </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  <section class="border rounded p-3">
+    <h4>Разделы Каталога</h4>
+    <div class="row g-3">
+      {% for category in categories %}
+      <div class="col-sm-6 col-md-4 col-lg-3 animation">
+        <div class="card text-center">
+          <img src="{{ url_for('static', filename='covers/black_book.png') }}" class="card-img-top"
+            alt="{{ category }}" />
+          <div class="card-body">
+            <h6 class="card-title mb-0">{{ category }}</h6>
+            <a href="{{ url_for('index.books_by_category', category_name=category) }}" class="stretched-link"></a>
           </div>
         </div>
       </div>
-    </section>
-
-    <!-- Разделы Каталога в своей рамке -->
-    <section class="border rounded p-3">
-      <h4>Разделы Каталога</h4>
-      <div class="row g-3">
-        <div class="col-sm-6 col-md-4 col-lg-3">
-          <div class="card text-center">
-            <img src="https://via.placeholder.com/150x200?text=Фантастика" class="card-img-top" alt="Фантастика" />
-            <div class="card-body">
-              <h6 class="card-title mb-0">Фантастика</h6>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-6 col-md-4 col-lg-3">
-          <div class="card text-center">
-            <img src="https://via.placeholder.com/150x200?text=Детектив" class="card-img-top" alt="Детектив" />
-            <div class="card-body">
-              <h6 class="card-title mb-0">Детектив</h6>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-6 col-md-4 col-lg-3">
-          <div class="card text-center">
-            <img src="https://via.placeholder.com/150x200?text=Роман" class="card-img-top" alt="Роман" />
-            <div class="card-body">
-              <h6 class="card-title mb-0">Роман</h6>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-6 col-md-4 col-lg-3">
-          <div class="card text-center">
-            <img src="https://via.placeholder.com/150x200?text=Исторические" class="card-img-top" alt="Исторические" />
-            <div class="card-body">
-              <h6 class="card-title mb-0">Исторические</h6>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-</main>
-
+      {% endfor %}
+    </div>
+  </section>
+</div>
 {% endblock %}
